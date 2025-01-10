@@ -287,3 +287,319 @@ TEST(matrix_tests, matrix_equality) {
 	EXPECT_TRUE(A == B);
 	EXPECT_TRUE(A != C);
 }
+
+TEST(matrix_tests, multiply_two_matrices) {
+	std::vector<std::vector<double>> arr = {
+	{1, 2, 3, 4},
+	{5, 6, 7, 8},
+	{9, 8, 7, 6},
+	{5, 4, 3, 2}
+	};
+
+	std::vector<std::vector<double>> arr2 = {
+	{-2, 1, 2, 3},
+	{3, 2, 1, -1},
+	{3, 2, 6, 5},
+	{1, 2, 7, 8}
+	};
+
+
+	std::vector<std::vector<double>> arr3 = {
+	{17, 19, 50, 48},
+	{37, 47, 114, 108},
+	{33, 51, 110, 102},
+	{13, 23, 46, 42}
+	};
+
+
+	matrix A = matrix(arr);
+	matrix B = matrix(arr2);
+	matrix C = matrix(arr3);
+
+	matrix D = A * B;
+
+	EXPECT_TRUE(D == C);
+}
+
+TEST(matrix_tests, multiply_matrix_vector) {
+	std::vector<std::vector<double>> arr = {
+	{1, 2, 3, 4},
+	{2, 4, 4, 2},
+	{8, 6, 4, 1},
+	{0, 0, 0, 1}
+	};
+
+	matrix A = matrix(arr);
+	tuple b = tuple(1, 2, 3, 1);
+
+	EXPECT_TRUE(A * b == tuple(18, 24, 33, 1));
+}
+
+TEST(matrix_tests, identity_matrix) {
+	std::vector<std::vector<double>> arr = {
+	{0, 1, 2, 4},
+	{1, 2, 4, 8},
+	{2, 4, 8, 16},
+	{4, 8, 16, 32}
+	};
+
+	matrix A = matrix(arr);
+	matrix ident = identity(4);
+
+	EXPECT_TRUE(ident * A == A);
+
+	tuple t = tuple(1, 2, 3, 4);
+	EXPECT_TRUE(ident * t == t);
+}
+
+TEST(matrix_tests, matrix_transpose) {
+	std::vector<std::vector<double>> arr = {
+	{0, 9, 3, 0},
+	{9, 8, 0, 8},
+	{1, 8, 5, 3},
+	{0, 0, 5, 8}
+	};
+
+	std::vector<std::vector<double>> arr2 = {
+	{0, 9, 1, 0},
+	{9, 8, 8, 0},
+	{3, 0, 5, 5},
+	{0, 8, 3, 8}
+	};
+
+	matrix A = matrix(arr);
+	matrix B = transpose(A);
+	matrix C = matrix(arr2);
+
+	EXPECT_TRUE(B == C);
+
+	matrix D = transpose(B);
+
+	EXPECT_TRUE(D == A);
+
+	matrix ident = identity(4);
+
+	EXPECT_TRUE(transpose(ident) == ident);
+}
+
+TEST(matrix_tests, submatrix) {
+	std::vector<std::vector<double>> arr = {
+	{1, 5, 0},
+	{-3, 2, 7},
+	{0, 6, -3}
+	};
+
+	std::vector<std::vector<double>> arr2 = {
+	{-3, 2},
+	{0, 6}
+	};
+
+	matrix A = matrix(arr);
+	matrix B = submatrix(A, 0, 2);
+	matrix C = matrix(arr2);
+
+	EXPECT_TRUE(B == C);
+
+	std::vector<std::vector<double>> arr3 = {
+	{-6, 1, 1, 6},
+	{-8, 5, 8, 6},
+	{-1, 0, 8, 2},
+	{-7, 1, -1, 1}
+	};
+
+	std::vector<std::vector<double>> arr4 = {
+	{-6, 1, 6},
+	{-8, 8, 6},
+	{-7, -1, 1}
+	};
+
+	matrix D = matrix(arr3);
+	matrix E = matrix(arr4);
+
+	EXPECT_TRUE(submatrix(D, 2, 1) == E);
+}
+
+TEST(matrix_tests, calculating_minors) {
+	std::vector<std::vector<double>> arr = {
+	{3, 5, 0},
+	{2, -1, -7},
+	{6, -1, 5}
+	};
+
+	matrix A = matrix(arr);
+	matrix B = submatrix(A, 1, 0);
+
+	EXPECT_NEAR(det(B), 25, double_error);
+	EXPECT_NEAR(minor(A, 1, 0), 25, double_error);
+}
+
+TEST(matrix_tests, calculating_cofactors) {
+	std::vector<std::vector<double>> arr = {
+	{3, 5, 0},
+	{2, -1, -7},
+	{6, -1, 5}
+	};
+
+	matrix A = matrix(arr);
+
+	EXPECT_NEAR(minor(A, 0, 0), -12, double_error);
+	EXPECT_NEAR(cofactor(A, 0, 0), -12, double_error);
+
+	EXPECT_NEAR(minor(A, 1, 0), 25, double_error);
+	EXPECT_NEAR(cofactor(A, 1, 0), -25, double_error);
+}
+
+TEST(matrix_tests, calculating_determinants_large_matrices) {
+	std::vector<std::vector<double>> arr = {
+	{1, 2, 6},
+	{-5, 8, -4},
+	{2, 6, 4}
+	};
+
+	matrix A = matrix(arr);
+
+	EXPECT_NEAR(cofactor(A, 0, 0), 56, double_error);
+	EXPECT_NEAR(cofactor(A, 0, 1), 12, double_error);
+	EXPECT_NEAR(cofactor(A, 0, 2), -46, double_error);
+	EXPECT_NEAR(det(A), -196, double_error);
+
+	std::vector<std::vector<double>> arr2 = {
+		{-2, -8, 3, 5},
+		{-3, 1, 7, 3},
+		{1, 2, -9, 6},
+		{-6, 7, 7, -9}
+	};
+
+	matrix B = matrix(arr2);
+
+	EXPECT_NEAR(cofactor(B, 0, 0), 690, double_error);
+	EXPECT_NEAR(cofactor(B, 0, 1), 447, double_error);
+	EXPECT_NEAR(cofactor(B, 0, 2), 210, double_error);
+	EXPECT_NEAR(cofactor(B, 0, 3), 51, double_error);
+	EXPECT_NEAR(det(B), -4071, double_error);
+}
+
+TEST(matrix_tests, is_invertible) {
+	std::vector<std::vector<double>> arr = {
+		{6, 4, 4, 4},
+		{5, 5, 7, 6},
+		{4, -9, 3, -7},
+		{9, 1, 7, -6}
+	};
+	matrix A = matrix(arr);	
+	
+	std::vector<std::vector<double>> arr2 = {
+		{-4, 2, -2, -3},
+		{9, 6, 2, 6},
+		{0, -5, 1, -5},
+		{0, 0, 0, 0}
+	};
+	matrix B = matrix(arr2);
+
+	EXPECT_NEAR(det(A), -2120, double_error);
+
+	EXPECT_TRUE(is_invertible(A));
+	EXPECT_FALSE(is_invertible(B));
+	EXPECT_NEAR(det(B), 0, double_error);
+}
+
+TEST(matrix_tests, calculate_matrix_inverse) {
+	std::vector<std::vector<double>> arr = {
+		{-5, 2, 6, -8},
+		{1, -5, 1, 8},
+		{7, 7, -6, -7},
+		{1, -3, 7, 4}
+	};
+	matrix A = matrix(arr);
+
+	matrix B = inverse(A);
+
+	std::vector<std::vector<double>> arr2 = {
+	{0.21805, 0.45113, 0.24060, -0.04511},
+	{-0.80827, -1.45677, -0.44361, 0.52068},
+	{-0.07895, -0.22368, -0.05263, 0.19737},
+	{-0.52256, -0.81391, -0.30075, 0.30639}
+	};
+	matrix C = matrix(arr2);
+
+	double rounding_error = 0.00001;
+
+	EXPECT_NEAR(det(A), 532, rounding_error);
+	EXPECT_NEAR(minor(A, 2, 3), 160, rounding_error);
+	EXPECT_NEAR(cofactor(A, 2, 3), -160, rounding_error);
+	EXPECT_NEAR(B(3, 2), -160.0 / 532, rounding_error);
+	EXPECT_NEAR(cofactor(A, 3, 2), 105, rounding_error);
+	EXPECT_NEAR(B(2, 3), 105.0 / 532, rounding_error);
+
+	EXPECT_TRUE(B.is_equal(C, rounding_error));
+}
+
+TEST(matrix_tests, calculate_matrix_inverse_2) {
+	std::vector<std::vector<double>> arr = {
+		{ 8 , -5 , 9 , 2},
+		{ 7 , 5 , 6 , 1},
+		{-6 , 0 , 9 , 6},
+		{-3 , 0 , -9 , -4}
+	};
+	matrix A = matrix(arr);
+
+	matrix B = inverse(A);
+
+	std::vector<std::vector<double>> arr2 = {
+	{ -0.15385 , -0.15385 , -0.28205 , -0.53846 },
+	{-0.07692 , 0.12308 , 0.02564 , 0.03077},
+	{ 0.35897 , 0.35897 , 0.43590 , 0.92308},
+	{ -0.69231 , -0.69231 , -0.76923 , -1.92308}
+	};
+	matrix C = matrix(arr2);
+
+	double rounding_error = 0.00001;
+
+	EXPECT_TRUE(B.is_equal(C, rounding_error));
+}
+
+TEST(matrix_tests, calculate_matrix_inverse_3) {
+	std::vector<std::vector<double>> arr = {
+		{9, 3, 0, 9},
+		{-5, -2, -6, -3},
+		{-4, 9, 6, 4},
+		{-7, 6, 6, 2}
+	};
+	matrix A = matrix(arr);
+
+	matrix B = inverse(A);
+
+	std::vector<std::vector<double>> arr2 = {
+	{-0.04074 , -0.07778 , 0.14444 , -0.22222},
+	{-0.07778 , 0.03333 , 0.36667 , -0.33333 },
+	{-0.02901 , -0.14630 , -0.10926 , 0.12963},
+	{ 0.17778 , 0.06667 , -0.26667 , 0.33333 }
+	};
+	matrix C = matrix(arr2);
+
+	double rounding_error = 0.00001;
+
+	EXPECT_TRUE(B.is_equal(C, rounding_error));
+}
+
+TEST(matrix_tests, multiplying_product_by_inverse) {
+	std::vector<std::vector<double>> arr = {
+	{3, -9, 7, 3},
+	{3, -8, 2, -9},
+	{-4, 4, 4, 1},
+	{-6, 5, -1, 1}
+	};
+	matrix A = matrix(arr);
+
+	std::vector<std::vector<double>> arr2 = {
+	{8, 2, 2, 2},
+	{3, -1, 7, 0},
+	{7, 0, 5, 4},
+	{6, -2, 0, 5}
+	};
+	matrix B = matrix(arr2);
+
+	matrix C = A * B;
+
+	EXPECT_TRUE(C * inverse(B) == A);
+}
